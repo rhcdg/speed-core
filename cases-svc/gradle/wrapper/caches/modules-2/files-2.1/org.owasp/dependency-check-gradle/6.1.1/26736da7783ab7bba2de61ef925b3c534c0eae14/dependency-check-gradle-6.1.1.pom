@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.owasp</groupId>
+  <artifactId>dependency-check-gradle</artifactId>
+  <version>6.1.1</version>
+  <name>dependency-check-gradle</name>
+  <description>OWASP dependency-check is a utility that attempts to detect publicly disclosed vulnerabilities contained within project dependencies.</description>
+  <url>https://github.com/jeremylong/dependency-check-gradle</url>
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>jeremylong</id>
+      <name>Jeremy Long</name>
+      <email>jeremy.long@owasp.org</email>
+    </developer>
+    <developer>
+      <id>wmaintw</id>
+      <name>Wei Ma</name>
+      <email>wma@thoughtworks.com</email>
+    </developer>
+  </developers>
+  <scm>
+    <connection>git@github.com:jeremylong/dependency-check-gradle.git</connection>
+    <developerConnection>git@github.com:jeremylong/dependency-check-gradle.git</developerConnection>
+    <url>https://github.com/jeremylong/dependency-check-gradle</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>org.owasp</groupId>
+      <artifactId>dependency-check-core</artifactId>
+      <version>6.1.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.owasp</groupId>
+      <artifactId>dependency-check-utils</artifactId>
+      <version>6.1.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.gpedro.integrations.slack</groupId>
+      <artifactId>slack-webhook</artifactId>
+      <version>1.4.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.spockframework</groupId>
+      <artifactId>spock-core</artifactId>
+      <version>1.1-groovy-2.4</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>groovy-all</artifactId>
+          <groupId>*</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+</project>

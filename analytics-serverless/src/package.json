@@ -1,0 +1,23 @@
+{
+  "name": "speed-analytics",
+  "version": "1.0.0",
+  "description": "analytics business and authorization routines",
+  "main": "main.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Steampunk-SPEED/speed-analytics.git"
+  },
+  "author": "joshua.penton@geocent.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Steampunk-SPEED/speed-analytics/issues"
+  },
+  "homepage": "https://github.com/Steampunk-SPEED/speed-analytics#readme",
+  "dependencies": {
+    "google-auth-library": "^7.0.3"
+  },
+  "devDependencies": {}
+}

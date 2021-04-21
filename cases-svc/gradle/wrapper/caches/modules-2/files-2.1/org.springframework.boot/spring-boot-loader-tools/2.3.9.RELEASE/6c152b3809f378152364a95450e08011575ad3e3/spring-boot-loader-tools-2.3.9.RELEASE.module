@@ -1,0 +1,133 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.boot",
+    "module": "spring-boot-loader-tools",
+    "version": "2.3.9.RELEASE",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.8.2",
+      "buildId": "h4uwaxvkonfqho4q5mr4ryupnm"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.apache.commons",
+          "module": "commons-compress",
+          "version": {
+            "requires": "1.19"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-core",
+          "version": {
+            "requires": "5.2.13.RELEASE"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-loader-tools-2.3.9.RELEASE.jar",
+          "url": "spring-boot-loader-tools-2.3.9.RELEASE.jar",
+          "size": 241700,
+          "sha512": "316d22647b82c85ec730a5c18cdd470e7b533dcb77c81e2b9121ff6f3aa238fe18605d761bd65a1d5d629831b3cf8e9e4a994486819d3e522f5534e74b6fff40",
+          "sha256": "21405ef998152b3a3ef8e9cc03cbb349a84636ea34dcd8fc6e7675682481627c",
+          "sha1": "557c42545c24594e1e4305263af8fad67b030cad",
+          "md5": "e0fe876711b53dfcd714dae673056d07"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.apache.commons",
+          "module": "commons-compress",
+          "version": {
+            "requires": "1.19"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-core",
+          "version": {
+            "requires": "5.2.13.RELEASE"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-loader-tools-2.3.9.RELEASE.jar",
+          "url": "spring-boot-loader-tools-2.3.9.RELEASE.jar",
+          "size": 241700,
+          "sha512": "316d22647b82c85ec730a5c18cdd470e7b533dcb77c81e2b9121ff6f3aa238fe18605d761bd65a1d5d629831b3cf8e9e4a994486819d3e522f5534e74b6fff40",
+          "sha256": "21405ef998152b3a3ef8e9cc03cbb349a84636ea34dcd8fc6e7675682481627c",
+          "sha1": "557c42545c24594e1e4305263af8fad67b030cad",
+          "md5": "e0fe876711b53dfcd714dae673056d07"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-loader-tools-2.3.9.RELEASE-javadoc.jar",
+          "url": "spring-boot-loader-tools-2.3.9.RELEASE-javadoc.jar",
+          "size": 167048,
+          "sha512": "0ec08f7f3e22676b4e6917090a427192642e48e280b5cd4f9fcf287364281b636610e3e8faac1b3fcaa86226fba1b448c23215f62a5f094feb0e9d52fe103e83",
+          "sha256": "694b50ea4a0c8432a7a10bf4608f2ba76d4e5fa0400eff4c2bc91164d3c1bc76",
+          "sha1": "2e97e4fdb110f8d1bbcbde042b601be93f55d9a8",
+          "md5": "f7d8c4090ba929108c5d943ae8154af1"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-loader-tools-2.3.9.RELEASE-sources.jar",
+          "url": "spring-boot-loader-tools-2.3.9.RELEASE-sources.jar",
+          "size": 207969,
+          "sha512": "d8ec22f6072b9073bed3143b08139327fc1cf95da4855428173d80dd55b9083149fa09c42d697859b40027175521b69e474f8aaa5e79a163e9de3b0eaba157c8",
+          "sha256": "1c869bf752e0afb4860f0c6fd337a8c1a3ffbf874fc47b8df8ee6daec4b9d044",
+          "sha1": "c6198ae21491c27916c42accba7a67f77f410a6a",
+          "md5": "1cf4763096f7686c978d30dfeca2ea47"
+        }
+      ]
+    }
+  ]
+}

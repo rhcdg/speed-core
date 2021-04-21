@@ -1,0 +1,57 @@
+[submodule "api-gateway"]
+	path = api-gateway
+	url = git@github.com:Steampunk-SPEED/speed-api-gateway.git
+	branch = develop
+[submodule "mongo"]
+	path = mongo
+	url = git@github.com:Steampunk-SPEED/speed-mongo.git
+	branch = develop
+[submodule "postgres"]
+	path = postgres
+	url = git@github.com:Steampunk-SPEED/speed-postgres.git
+	branch = develop
+[submodule "accounts-svc"]
+	path = accounts-svc
+	url = git@github.com:Steampunk-SPEED/speed-accounts.git
+	branch = develop
+[submodule "forms-svc"]
+	path = forms-svc
+	url = git@github.com:Steampunk-SPEED/speed-forms.git
+	branch = develop
+[submodule "cases-svc"]
+	path = cases-svc
+	url = git@github.com:Steampunk-SPEED/speed-cases.git
+	branch = develop
+[submodule "test-automation"]
+	path = test-automation
+	url = git@github.com:Steampunk-SPEED/speed-automation.git
+	branch = develop
+[submodule "adjudicator-web"]
+	path = adjudicator-web
+	url = git@github.com:Steampunk-SPEED/speed-adjudicator-web.git
+	branch = develop
+[submodule "applicant-web"]
+	path = applicant-web
+	url = git@github.com:Steampunk-SPEED/speed-applicant-web.git
+	branch = develop
+[submodule "reports-web"]
+	path = reports-web
+	url = git@github.com:Steampunk-SPEED/speed-reports-web.git
+	branch = develop
+[submodule "security-checks-serverless"]
+	path = security-checks-serverless
+	url = git@github.com:Steampunk-SPEED/speed-security-checks.git
+	branch = develop
+[submodule "cis-data-api"]
+	path = cis-data-api
+	url = git@github.com:Steampunk-SPEED/speed-cis-data-api.git
+	branch = develop
+[submodule "print-client"]
+	path = print-client
+	url = git@github.com:Steampunk-SPEED/speed-print-client.git
+	branch = develop
+[submodule "analytics-serverless"]
+	path = analytics-serverless
+	url = git@github.com:Steampunk-SPEED/speed-analytics.git
+	branch = develop
+

@@ -1,0 +1,165 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('org.owasp:dependency-check-gradle:6.1.1')
+    }
+}
+
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'org.springframework.boot' version '2.3.9.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'jacoco'
+    id 'org.sonarqube' version '3.1.1'
+    id 'org.liquibase.gradle' version '2.0.4'
+    id 'checkstyle'
+    id 'io.freefair.lombok' version '5.3.0'
+}
+
+if(JavaVersion.current() != JavaVersion.VERSION_11){
+    throw new GradleException("This build must be run with Java 11. Currently running Java ${JavaVersion.current()}")
+}
+
+apply plugin: 'org.owasp.dependencycheck'
+
+dependencyCheck {
+    suppressionFile = "owasp.suppression.xml"
+    failBuildOnCVSS = 6
+}
+
+ext['tomcat.version'] = '9.0.43'
+
+group = 'net.steampunkfoundry.techdemo'
+version = '0.0.1-SNAPSHOT'
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+    maven {
+        url = System.env.SPEED_REPO_URL
+
+        credentials {
+            username System.env.SPEED_REPO_USER
+            password System.env.SPEED_REPO_PASSWORD
+        }
+    }
+}
+
+sourceSets {
+    itest {
+        java.srcDir file('src/itest/java')
+        resources.srcDir file('src/itest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectKey', 'speed:api-gateway'
+        property 'sonar.projectName', 'API Gateway'
+        property 'sonar.coverage.exclusions', '**/*Application.java,**/filter/*,**/repository/*'
+        property 'sonar.zaproxy.reportPath', 'reports/zap.xml'
+        property 'sonar.zaproxy.htmlReportPath', 'reports/zap.html'
+    }
+}
+
+task itest(type: Test) {
+    testClassesDirs = sourceSets.itest.output.classesDirs
+    classpath = sourceSets.itest.runtimeClasspath
+}
+
+check.dependsOn itest
+itest.mustRunAfter test
+jacocoTestReport.dependsOn jacocoTestCoverageVerification
+
+test.finalizedBy jacocoTestReport
+itest.finalizedBy jacocoTestReport
+
+jacoco {
+    toolVersion = "0.8.5"
+    reportsDir = file("${buildDir}/reports/jacoco")
+}
+jacocoTestReport {
+    //For dependsOn & executionData, add 'test' if unit tests are added later. Currently there are only integration tests...
+    dependsOn test
+    executionData(test)
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    //For dependsOn & executionData, add 'test' if unit tests are added later. Currently there are only integration tests...
+    dependsOn test
+    executionData(test)
+    violationRules {
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.90
+            }
+            // Exclude main app file from coverage verification
+            excludes = [
+                    'net.steampunkfoundry.techdemo.zuul.ZuulApplication',
+                    'net.steampunkfoundry.techdemo.zuul.filter.SecurityConfig'
+            ]
+        }
+    }
+}
+
+configurations {
+    itestCompile.extendsFrom testCompile
+    itestRuntime.extendsFrom testRuntime
+}
+
+checkstyle {
+    toolVersion '8.34'
+    configFile file("config/checkstyle/google_checks.xml")
+    maxWarnings = 0
+}
+
+bootRun {
+    systemProperties System.properties
+}
+dependencies {
+    implementation enforcedPlatform('net.steampunkfoundry.techdemo:td-bom:1.0.6')
+
+    implementation 'io.springfox:springfox-swagger-ui'
+    implementation 'io.springfox:springfox-swagger2'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
+    implementation 'org.glassfish.jaxb:jaxb-runtime'
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul'
+
+    implementation('org.apache.tomcat.embed:tomcat-embed-core') {
+        version {
+            strictly '9.0.43'
+        }
+    }
+    implementation('org.apache.tomcat.embed:tomcat-embed-websocket') {
+        version {
+            strictly '9.0.43'
+        }
+    }
+
+    implementation('org.apache.tomcat:tomcat-annotations-api') {
+        version {
+            strictly '9.0.43'
+        }
+    }
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

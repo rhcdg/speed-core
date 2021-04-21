@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: forms
+  devtools:
+    remote:
+      secret: mysecret
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MOVIES_MONGO_DB}?authSource=admin
+    rest:
+      base-path: /api/data
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AWS_COGNITO_URL}
+logging.level:
+  com: WARN
+  org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver: INFO
+  org.springframework.data.mongodb.core.MongoTemplate: ERROR
+cases.endpoint: ${CASE_SERVICE_URI}/api/case
+
+usps.api: ${USPS_API}
+usps.client.key: ${USPS_CLIENT_KEY}
+
+management.endpoints.web.exposure.include: health
+endpoint.health.show-details: ALWAYS

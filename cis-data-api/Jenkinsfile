@@ -1,0 +1,49 @@
+@Library('td-shared-lib') _
+
+if (env.CHANGE_ID) {
+    //if it's a PR run the pr pipeline
+    pr([
+            setup: {
+                sh 'cd ops && ./pipeline.sh'
+            },
+            buildCommand: {
+                sh "ls -la"
+            },
+            unitTestCommand: {
+                sh "ls -la"
+            },
+            owaspCommand: {
+                sh "ls -la"
+           },
+            integrationTestCommand: {
+                sh "ls -la"
+            },
+            disableSonar: true,
+            svc: 'cis-data-api',
+            project: 'speed',
+            disableAnchore: true
+    ])
+} else if ('develop'.equals(env.BRANCH_NAME)) {
+    //if develop branch, run the develop pipeline
+    develop([svc: 'cis-data-api', project: 'speed'])
+} else if ('hotfix'.equals(env.BRANCH_NAME)) {
+    //if hotfix branch, run the hotfix pipeline
+    develop([svc: 'cis-data-api', project: 'speed'])
+} else if (!'release'.equals(env.BRANCH_NAME)) {
+    //any branch other than release, just run basic developer tests
+    branch([
+            setup: {
+                sh "ls -la"
+            },
+            buildCommand: {
+                sh "ls -la"
+            },
+            unitTestCommand: {
+                sh "ls -la"
+            },
+            owaspCommand: {
+                sh "ls -la"
+            },
+            disableSonar: true
+    ])
+}

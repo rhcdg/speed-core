@@ -1,0 +1,32 @@
+@import '../../sass/variables';
+
+footer {
+  background-color: #e8e8e8;
+  padding-top: 2*$spacer;
+  padding-bottom: 2*$spacer;
+  text-align: center;
+  position:absolute;  // Maybe needs to be removed
+  left:0;  // Maybe needs to be removed
+  bottom:0;  // Maybe needs to be removed
+  right:0;  // Maybe needs to be removed
+
+  .footer-logo {
+    max-width: 50px;
+
+    @media (max-width: 768px) {
+      max-width: 40px;
+    }
+  }
+
+  .footer-heading {
+    display: inline-block;
+    margin: 0 0 0 15px;
+    vertical-align: middle;
+    font-size: 18px;
+    font-weight: 600;
+
+    @media (max-width: 768px) {
+      font-size: 13px;
+    }
+  }
+}

@@ -1,0 +1,183 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('org.owasp:dependency-check-gradle:6.1.1')
+    }
+}
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'eclipse'
+    id 'org.springframework.boot' version '2.3.9.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'jacoco'
+    id 'org.sonarqube' version '3.1.1'
+    id 'checkstyle'
+    id "de.inetsoftware.setupbuilder" version "4.8.7"
+}
+
+javafx {
+    version = "11.0.2"
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+if (JavaVersion.current() != JavaVersion.VERSION_11) {
+    throw new GradleException("This build must be run with Java 11. Currently running Java ${JavaVersion.current()}")
+}
+
+apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'maven-publish'
+
+dependencyCheck {
+    suppressionFile = "owasp.suppression.xml"
+    failBuildOnCVSS = 4
+}
+
+ext['tomcat.version'] = '9.0.43'
+
+group = 'net.steampunkfoundry.techdemo.client'
+version = '0.0.1-SNAPSHOT'
+description = 'print-client'
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
+
+publishing {
+    repositories {
+        maven {
+            url = System.env.SPEED_REPO_URL.replaceAll('releases', 'snapshots')
+
+            credentials {
+                username System.env.SPEED_REPO_USER
+                password System.env.SPEED_REPO_PASSWORD
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+            artifact("${buildDir}/libs/${description}-${project.version}.jar") {
+                extension 'jar'
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = System.env.SPEED_REPO_URL
+
+        credentials {
+            username System.env.SPEED_REPO_USER
+            password System.env.SPEED_REPO_PASSWORD
+        }
+    }
+}
+
+sourceSets {
+    itest {
+        java.srcDir file('src/itest/java')
+        resources.srcDir file('src/itest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.coverage.exclusions", "**/*Application.java,**/*AuthenticationHelper.java"
+        property 'sonar.zaproxy.reportPath', 'reports/zap.xml'
+        property 'sonar.zaproxy.htmlReportPath', 'reports/zap.html'
+    }
+}
+
+task itest(type: Test) {
+    testClassesDirs = sourceSets.itest.output.classesDirs
+    classpath = sourceSets.itest.runtimeClasspath
+}
+
+check.dependsOn itest
+itest.mustRunAfter test
+jacocoTestReport.dependsOn jacocoTestCoverageVerification
+
+test.finalizedBy jacocoTestReport
+itest.finalizedBy jacocoTestReport
+
+jacoco {
+    toolVersion = "0.8.5"
+    reportsDir = file("${buildDir}/reports/jacoco")
+}
+
+jacocoTestReport {
+    dependsOn test
+    executionData(test)
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test
+    executionData(test)
+    violationRules {
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.10
+            }
+        }
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.20
+            }
+        }
+    }
+}
+
+configurations {
+    itestCompile.extendsFrom testCompile
+    itestRuntime.extendsFrom testRuntime
+}
+
+checkstyle {
+    toolVersion '8.34'
+    configFile file("config/checkstyle/google_checks.xml")
+    maxWarnings = 0
+}
+
+dependencies {
+    implementation enforcedPlatform('net.steampunkfoundry.techdemo:td-bom:1.0.6')
+
+    implementation 'org.springframework.boot:spring-boot-starter:2.4.4'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.4.4'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.4.4'
+    implementation 'org.openjfx:javafx-controls:11'
+    implementation 'org.openjfx:javafx-fxml:11'
+    implementation 'org.openjfx:javafx-base:11'
+    implementation 'org.openjfx:javafx-graphics:11'
+    implementation 'com.amazonaws:aws-java-sdk-cognitoidentity:1.11.982'
+    implementation 'com.amazonaws:aws-java-sdk-cognitosync:1.11.982'
+    implementation 'com.amazonaws:aws-java-sdk-cognitoidp:1.11.982'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.23'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation("org.testfx:testfx-junit:4.0.15-alpha")
+    implementation 'org.json:json:20170516'
+    implementation 'org.projectlombok:lombok'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

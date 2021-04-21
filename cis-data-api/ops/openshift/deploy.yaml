@@ -1,0 +1,110 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: speed-cis-data-api-deploy
+  annotations:
+    description:
+    tags: speed
+    iconClass: icon-nodejs
+    template.openshift.io/bindable: 'false'
+labels:
+  template: speed-cis-data-api-deploy
+objects:
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${SVC_NAME}"
+    annotations:
+      description: Exposes and load balances the application pods
+  spec:
+    ports:
+    - name: web
+      port: 80
+      targetPort: 3000
+    selector:
+      name: "${SVC_NAME}"
+
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${SVC_NAME}"
+    annotations:
+      description: Defines how to deploy the application server
+      template.alpha.openshift.io/wait-for-ready: 'true'
+  spec:
+    strategy:
+      type: Recreate
+    replicas: 1
+    selector:
+      name: "${SVC_NAME}"
+    template:
+      metadata:
+        name: "${SVC_NAME}"
+        labels:
+          name: "${SVC_NAME}"
+      spec:
+        containers:
+        - name: app
+          image: " "
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 3000
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 3
+            httpGet:
+              path: ${HEALTH_CHECK_ENDPOINT}
+              port: 3000
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: ${HEALTH_CHECK_ENDPOINT}
+              port: 3000
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT}"
+
+parameters:
+- name: SVC_IMAGE_NAME
+  displayName: Image name
+  description: Name of docker image to deploy
+  required: true
+  value: ''
+- name: SVC_NAME
+  displayName: Microservice name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: ''
+- name: SVC_IMAGE_TAG
+  displayName: Service Docker Image Tag
+  description: Tag corresponding to environment
+  required: true
+  value: ''
+- name: NAMESPACE
+  displayName: Namespace
+  description: The OpenShift Namespace where the ImageStream resides.
+  required: true
+  value: ''
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  description: Maximum amount of memory the Node.js container can use.
+  required: true
+  value: 1Gi
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the Node.js service, if left
+    blank a value will be defaulted.
+  value: ''
+- description: Volume space available for data, e.g. 1Gi, 2Gi.
+  displayName: Volume Capacity
+  name: VOLUME_CAPACITY
+  required: true
+  value: 20Gi
+- description: Health check endpoint
+  displayName: Health check endpoint
+  name: HEALTH_CHECK_ENDPOINT
+  required: true
+  value: "/api-docs/index.html"

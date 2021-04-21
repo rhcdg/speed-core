@@ -1,0 +1,21 @@
+@import '../../sass/variables';
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.case-tabs .MuiTabs-flexContainer{
+  height: 100%;
+}
+
+.case-page-tab {
+  justify-content: space-between;
+}
+
+.search-bar {
+  border: 1px solid $color-gray;
+  margin: 10px;
+  padding: 5px 10px;
+  width: 25vw;
+}

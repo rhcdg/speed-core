@@ -1,0 +1,5 @@
+build/
+.gradle/
+gradle/
+src/main/java/net/steampunkfoundry/techdemo/project/controller/
+bin

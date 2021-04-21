@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500" prefWidth="500"
+  xmlns="http://javafx.com/javafx/11.0.1"
+  fx:controller="net.steampunkfoundry.techdemo.client.printclient.controller.CaseListController">
+  <bottom>
+    <HBox alignment="CENTER" spacing="15">
+      <children>
+        <Button alignment="CENTER" defaultButton="true" id="refreshButton" mnemonicParsing="false"
+          text="Refresh" fx:id="refreshButton"/>
+        <Button alignment="BOTTOM_RIGHT" defaultButton="true" id="printButton"
+          mnemonicParsing="false"
+          text="Print" fx:id="printButton"/>
+      </children>
+      <padding>
+        <Insets bottom="10" left="0" right="0" top="10"/>
+      </padding>
+    </HBox>
+  </bottom>
+  <center>
+    <TableView prefHeight="200.0" prefWidth="500.0" fx:id="caseTable">
+    </TableView>
+  </center>
+  <top>
+
+  </top>
+</BorderPane>

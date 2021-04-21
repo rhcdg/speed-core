@@ -1,0 +1,133 @@
+{
+  "name": "web-react",
+  "version": "0.1.0",
+  "jest": {
+    "testMatch": [
+      "**/?(*.)+(test).[jt]s?(x)"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "lines": 90
+      }
+    },
+    "coverageReporters": [
+      "lcov",
+      "text",
+      "cobertura"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!<rootDir>/node_modules/",
+      "!<rootDir>/src/__tests__/",
+      "!**/assets/**",
+      "!**/environments/**",
+      "!**/index.tsx",
+      "!**/reportWebVitals.ts",
+      "!**/App.tsx",
+      "!**/react-app-env.d.ts"
+    ]
+  },
+  "jest-junit": {
+    "suiteName": "jest tests",
+    "output": "./coverage/junit.xml",
+    "classNameTemplate": "{classname} - {title}",
+    "titleTemplate": "{classname} - {title}",
+    "ancestorSeparator": " > ",
+    "usePathForSuiteName": "true"
+  },
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/react-fontawesome": "^0.1.13",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@testing-library/dom": "^7.30.1",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.3.0",
+    "@types/jest": "^26.0.16",
+    "@types/node": "^12.19.8",
+    "@types/react": "^16.14.2",
+    "@types/react-dom": "^16.9.10",
+    "@types/react-router-dom": "^5.1.6",
+    "axios": "^0.21.1",
+    "bootstrap": "^4.5.3",
+    "clsx": "^1.1.1",
+    "form-data": "^3.0.0",
+    "formik": "^2.2.6",
+    "jwt-decode": "^3.1.2",
+    "node-sass": "^4.14.1",
+    "oidc-client": "^1.11.3",
+    "owasp-dependency-check": "^0.0.5",
+    "popper.js": "^1.16.1",
+    "react": "^17.0.1",
+    "react-bootstrap": "^1.4.0",
+    "react-dom": "^17.0.1",
+    "react-ga": "^3.3.0",
+    "react-oidc": "^1.0.3",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.1.2",
+    "web-vitals": "^0.2.4",
+    "yup": "^0.32.8"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start:ci": "react-app-rewired start",
+    "build": "react-scripts build",
+    "build:ci": "react-app-rewired build",
+    "owasp": "owasp-dependency-check --scan package-lock.json --failOnCVSS 7 --suppression owasp.suppression.xml --project \"adjudicator-web\" -f HTML JSON",
+    "test": "react-scripts test",
+    "test:ci": "react-scripts test --testResultsProcessor ./node_modules/jest-junit --coverage --coverageDirectory=coverage --watchAll=false",
+    "coverage": "react-scripts test --coverage --watchAll",
+    "lint": "eslint ./src/",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/react-test-renderer": "^17.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "axios-mock-adapter": "^1.19.0",
+    "eslint": "^7.14.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "history": "^5.0.0",
+    "husky": "^4.3.6",
+    "jest-junit": "^12.0.0",
+    "prettier": "2.2.1",
+    "react-app-rewired": "^2.1.8",
+    "react-router": "^5.2.0",
+    "react-test-renderer": "^17.0.1",
+    "tslint": "^6.1.3"
+  }
+}

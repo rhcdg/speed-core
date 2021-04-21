@@ -1,0 +1,11 @@
+@import "sass/variables";
+@import url('https://fonts.googleapis.com/css?family=Merriweather|Source+Sans+Pro');
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "sass/styles";
+
+.main-content {
+  padding-top: 7 * $spacer;
+  padding-bottom: 7 * $spacer;
+  padding-right: 90px;  // Double check
+  padding-left: 90px;  // Double check
+}

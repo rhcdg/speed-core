@@ -1,0 +1,12 @@
+@import '../../sass/variables';
+
+.cases-table-data-centered {
+  text-align: center;
+}
+
+tbody tr {
+  &:hover {
+    background-color: $color-gray-background;
+    cursor: pointer;
+  }
+}

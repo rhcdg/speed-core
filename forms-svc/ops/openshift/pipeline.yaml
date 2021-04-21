@@ -1,0 +1,123 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: speed-forms-svc-pipeline
+  annotations:
+    description:
+    tags: speed
+    template.openshift.io/bindable: 'false'
+labels:
+  template: speed-forms-svc-pipeline
+objects:
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Keeps track of changes in the application image
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      type: Git
+      git:
+        uri: "git@github.com:Geocent/speed-forms.git"
+        ref: "develop"
+      sourceSecret:
+        name: github-key
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+        env:
+          - name: "GIT_SSL_NO_VERIFY"
+            value: "true"
+          - name: SPEED_REPO_URL
+            value: ${SPEED_REPO_URL}
+          - name: SPEED_REPO_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: speed-repo-credentials
+          - name: SPEED_REPO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: speed-repo-credentials
+      type: Docker
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${NAME}:latest
+    triggers: []
+
+
+parameters:
+- name: SPEED_REPO_URL
+  displayName: Nexus Repo URL
+  value: 'https://nexus-ci.speedc2c24.steampunkfoundry.net/repository/maven-releases/'
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: speed-forms-svc
+- name: CI_NAME
+  displayName: CI name
+  required: true
+  value: speed-forms-svc-ci
+- name: FUNCTIONAL_NAME
+  displayName: FUNCTIONAL name
+  required: true
+  value: speed-forms-svc-functional
+- name: STAGING_NAME
+  displayName: STAGING name
+  required: true
+  value: speed-forms-svc-staging
+- name: NAMESPACE
+  displayName: Namespace
+  description: The OpenShift Namespace where the ImageStream resides.
+  required: true
+  value: ci
+- name: SSH_KEY_NAME
+  displayName: SSH key for git checkout
+  required: true
+  value: ci-openshiftkey
+- name: SOURCE_REPOSITORY_URL
+  displayName: Git Repository URL
+  description: The URL of the repository with your application source code.
+  required: true
+  value: git@github.com:Geocent/speed-forms.git
+- name: SOURCE_REPOSITORY_REF
+  displayName: Git Reference
+  description: Set this to a branch name, tag or other ref of your repository if you
+    are not using the default branch.
+  value: "develop"
+- name: CONTEXT_DIR
+  displayName: Context Directory
+  description: Set this to the relative path to your project if it is not in the root
+    of your repository.
+- name: GITHUB_WEBHOOK_SECRET
+  displayName: GitHub Webhook Secret
+  description: Github trigger secret.  A difficult to guess string encoded as part
+    of the webhook URL.  Not encrypted.
+  value: "RbF0jyNT5AD7SnN3JMw5wIguMxumnuL3YluhcieU"
+- name: GENERIC_WEBHOOK_SECRET
+  displayName: Generic Webhook Secret
+  description: A secret string used to configure the Generic webhook.
+  value: "RbF0jyNT5AD7SnN3JMw5wIguMxumnuL3YluhcieU"
+- name: NPM_MIRROR
+  displayName: Custom NPM Mirror URL
+  description: The custom NPM mirror URL
+  value: ''
+- name: SPRING_BOOT_ARTIFACT
+  displayName: Spring Boot Artifact filename
+  value: 'forms-0.0.1-SNAPSHOT.jar'

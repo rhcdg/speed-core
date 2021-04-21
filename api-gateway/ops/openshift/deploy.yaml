@@ -1,0 +1,170 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: speed-api-gateway-svc-deploy
+  annotations:
+    description:
+    tags: speed
+    template.openshift.io/bindable: 'false'
+labels:
+  template: speed-api-gateway-svc-deploy
+objects:
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${SVC_NAME}"
+    annotations:
+      description: Exposes and load balances the application pods
+  spec:
+    ports:
+    - name: web
+      port: 80
+      targetPort: 8080
+    selector:
+      name: "${SVC_NAME}"
+
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${SVC_NAME}"
+  spec:
+    host: "${APPLICATION_DOMAIN}"
+    to:
+      kind: Service
+      name: "${SVC_NAME}"
+    tls:
+      termination: edge
+
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${SVC_NAME}"
+    annotations:
+      description: Defines how to deploy the application server
+      template.alpha.openshift.io/wait-for-ready: 'true'
+  spec:
+    strategy:
+      type: Recreate
+    replicas: 1
+    selector:
+      name: "${SVC_NAME}"
+    template:
+      metadata:
+        name: "${SVC_NAME}"
+        labels:
+          name: "${SVC_NAME}"
+      spec:
+        containers:
+        - name: app
+          imagePullPolicy: Always
+          image: " "
+          env:
+            - name: ALLOWED_CORS_HOST
+              value: ${ALLOWED_CORS_HOST}
+            - name: SPRING_PROFILES_ACTIVE
+              value: ${SPRING_PROFILES_ACTIVE}
+            - name: USERS_SERVICE_ENDPOINT
+              value: ${USERS_SERVICE_ENDPOINT}
+            - name: AWS_COGNITO_URL
+              value: ${AWS_COGNITO_URL}
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 3
+            httpGet:
+              path: ${HEALTH_CHECK_ENDPOINT}
+              port: 8080
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: ${HEALTH_CHECK_ENDPOINT}
+              port: 8080
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT}"
+
+parameters:
+- name: SVC_IMAGE_NAME
+  displayName: Image name
+  description: Name of docker image to deploy
+  required: true
+  value: ''
+- name: SVC_NAME
+  displayName: Microservice name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: ''
+- name: SVC_IMAGE_TAG
+  displayName: Service Docker Image Tag
+  description: Tag corresponding to environment
+  required: true
+  value: ''
+- name: NAMESPACE
+  displayName: Namespace
+  description: The OpenShift Namespace where the ImageStream resides.
+  required: true
+  value: ''
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  description: Maximum amount of memory the Node.js container can use.
+  required: true
+  value: 1Gi
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the Node.js service, if left
+    blank a value will be defaulted.
+  value: ''
+- description: Postgres db name
+  displayName: Postgres db name
+  name: DB_NAME
+  required: true
+  value: ''
+- description: Volume space available for data, e.g. 1Gi, 2Gi.
+  displayName: Volume Capacity
+  name: VOLUME_CAPACITY
+  required: true
+  value: 20Gi
+- description: Postgres endpoint
+  displayName: Postgres endpoint
+  name: POSTGRES_ENDPOINT
+  required: true
+  value: ""
+- description: Postgres db name
+  displayName: Postgres db name
+  name: POSTGRES_DB
+  required: true
+  value: ""
+- description: Postgres port
+  displayName: Postgres port
+  name: POSTGRES_PORT
+  required: true
+  value: "5432"
+- description: Spring active profile
+  displayName: Spring active profile
+  name: SPRING_PROFILES_ACTIVE
+  required: true
+  value: ""
+- description: Health check endpoint
+  displayName: Health check endpoint
+  name: HEALTH_CHECK_ENDPOINT
+  required: true
+  value: "/actuator/health"
+- description: CORS
+  displayName: CORS
+  name: ALLOWED_CORS_HOST
+  required: true
+  value: "*"
+- description: Users service endpoint
+  displayName: Users service endpoint
+  name: USERS_SERVICE_ENDPOINT
+  required: true
+  value: ""
+- description: AWS Cognito OIDC URL
+  displayName: AWS Cognito OIDC URL
+  name: AWS_COGNITO_URL
+  required: true
+  value: ""

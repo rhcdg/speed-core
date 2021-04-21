@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: ./Dockerfile
+      args:
+        SPEED_REPO_URL: $SPEED_REPO_URL
+        SPEED_REPO_USER: $SPEED_REPO_USER
+        SPEED_REPO_PASSWORD: $SPEED_REPO_PASSWORD
+    ports:
+      - "9080:8080"
+    env_file:
+      - .env-dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - postgres
+      - accounts-svc
+      - cases-svc
+  forms-web:
+    build:
+      context: ./forms-web
+      dockerfile: ./Dockerfile-dev
+      args:
+        webenv: local
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env-dev
+    # inject local volumes for watch reloading of application source
+    volumes:
+      - ./forms-web/public:/app/public
+      - ./forms-web/src:/app/src
+    working_dir: /app
+    stdin_open: true
+    depends_on:
+      - api-gateway

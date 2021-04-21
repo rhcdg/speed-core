@@ -1,0 +1,121 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: speed-accounts-svc-integration
+  annotations:
+    description:
+    tags: speed
+    template.openshift.io/bindable: 'false'
+labels:
+  template: speed-accounts-svc-integration
+objects:
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${DB_NAME}
+    name: ${DB_NAME}
+  spec:
+    ports:
+      - name: client
+        port: ${{POSTGRES_PORT}}
+        protocol: TCP
+        targetPort: ${{POSTGRES_PORT}}
+    selector:
+      app: ${DB_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    name: ${DB_NAME}
+    labels:
+      app: ${DB_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${DB_NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ${DB_NAME}
+      spec:
+        containers:
+        - image: " "
+          name: postgres
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          resources:
+            limits:
+              memory: ${MEMORY_LIMIT}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: accounts-svc-postgres
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: accounts-svc-postgres
+                  key: password
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+    triggers:
+    - imageChangeParams:
+        automatic: false
+        containerNames:
+        - postgres
+        from:
+          kind: ImageStreamTag
+          name: "postgres:latest"
+          namespace: "ci"
+      type: ImageChange
+    - type: ConfigChange
+
+parameters:
+- name: NAMESPACE
+  displayName: Namespace
+  description: The OpenShift Namespace where the ImageStream resides.
+  required: true
+  value: ''
+- description: Postgres db name
+  displayName: Postgres db name
+  name: DB_NAME
+  required: true
+  value: ''
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  description: Maximum amount of memory the Node.js container can use.
+  required: true
+  value: 1Gi
+- description: Postgres endpoint
+  displayName: Postgres endpoint
+  name: POSTGRES_ENDPOINT
+  required: true
+  value: ""
+- description: Postgres db name
+  displayName: Postgres db name
+  name: POSTGRES_DB
+  required: true
+  value: ""
+- description: Postgres port
+  displayName: Postgres port
+  name: POSTGRES_PORT
+  required: true
+  value: "5432"

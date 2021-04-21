@@ -1,0 +1,555 @@
+databaseChangeLog:
+  - changeSet:
+      id: baseline-1
+      author: rrussell
+      changes:
+        - createSequence:
+            sequenceName: hibernate_sequence
+            incrementBy: 1
+            startValue: 100
+        - createTable:
+            tableName: revinfo
+            columns:
+              - column:
+                  name: rev
+                  type: INT
+                  autoIncrement: true
+                  startWith: 100
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: revtstmp
+                  type: BIGINT
+              - column:
+                  name: username
+                  type: varchar(255)
+        - createTable:
+            tableName: cases_aud
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    - nullable: false
+              - column:
+                  name: rev
+                  type: INT
+                  constraints:
+                    referencedTableName: revinfo
+                    foreignKeyName: fk_cases_aud_revinfo
+                    referencedColumnNames: rev
+                    nullable: false
+              - column:
+                  name: revtype
+                  type: SMALLINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: case_number
+                  type: varchar(255)
+              - column:
+                  name: form_id
+                  type: BIGINT
+              - column:
+                  name: status
+                  type: varchar(255)
+              - column:
+                  name: adjudicator_id
+                  type: varchar(255)
+              - column:
+                  name: a_number
+                  type: varchar(15)
+              - column:
+                  name: supporting_evidence_validated
+                  type: boolean
+              - column:
+                  name: case_correspondence_validated
+                  type: boolean
+              - column:
+                  name: decision_justification
+                  type: varchar(1000)
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+              - column:
+                  name: last_modified_by
+                  type: varchar(255)
+              - column:
+                  name: last_modified
+                  type: TIMESTAMP
+        - createTable:
+            tableName: cases
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  startWith: 100
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: case_number
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: form_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(255)
+              - column:
+                  name: adjudicator_id
+                  type: varchar(255)
+              - column:
+                  name: a_number
+                  type: varchar(15)
+              - column:
+                  name: supporting_evidence_validated
+                  type: boolean
+                  defaultValue: false
+              - column:
+                  name: case_correspondence_validated
+                  type: boolean
+                  defaultValue: false
+              - column:
+                  name: decision_justification
+                  type: varchar(1000)
+              - column:
+                  name: created_by
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified
+                  type: TIMESTAMP
+              - column:
+                  name: last_modified_by
+                  type: varchar(255)
+        - createTable:
+            tableName: security_checks_aud
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rev
+                  type: INT
+                  constraints:
+                    referencedTableName: revinfo
+                    foreignKeyName: fk_security_checks_aud_revinfo
+                    referencedColumnNames: rev
+                    nullable: false
+              - column:
+                  name: revtype
+                  type: SMALLINT
+              - column:
+                  name: case_id
+                  type: BIGINT
+              - column:
+                  name: security_check_type
+                  type: varchar(255)
+              - column:
+                  name: security_check_status
+                  type: varchar(255)
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+              - column:
+                  name: last_modified_by
+                  type: varchar(255)
+              - column:
+                  name: last_modified
+                  type: TIMESTAMP
+        - createTable:
+            tableName: security_checks
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  startWith: 100
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: case_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: security_check_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: security_check_status
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified
+                  type: TIMESTAMP
+              - column:
+                  name: last_modified_by
+                  type: varchar(255)
+        - createTable:
+            tableName: correspondences_aud
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rev
+                  type: INT
+                  constraints:
+                    referencedTableName: revinfo
+                    foreignKeyName: fk_correspondences_aud_revinfo
+                    referencedColumnNames: rev
+                    nullable: false
+              - column:
+                  name: revtype
+                  type: SMALLINT
+              - column:
+                  name: case_id
+                  type: BIGINT
+              - column:
+                  name: document_key
+                  type: varchar(255)
+              - column:
+                  name: doc_type
+                  type: varchar(255)
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+              - column:
+                  name: last_modified_by
+                  type: varchar(255)
+              - column:
+                  name: last_modified
+                  type: TIMESTAMP
+        - createTable:
+            tableName: correspondences
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  startWith: 100
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: case_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: document_key
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: doc_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified
+                  type: TIMESTAMP
+              - column:
+                  name: last_modified_by
+                  type: varchar(255)
+  - changeSet:
+       id: baseline-2
+       author: rrussell
+       changes:
+         -  addPrimaryKey:
+              columnNames: id, rev
+              constraintName: pk_cases_aud
+              tableName: cases_aud
+              validate: true
+         -  addPrimaryKey:
+              columnNames: id, rev
+              constraintName: pk_security_checks_aud
+              tableName: security_checks_aud
+              validate: true
+         -  addPrimaryKey:
+              columnNames: id, rev
+              constraintName: pk_correspondences_aud
+              tableName: correspondences_aud
+              validate: true
+  - changeSet:
+       id: baseline-3
+       author: rrussell
+       changes:
+          - sql:
+              sql: INSERT INTO public.cases (id, case_number, form_id, status, adjudicator_id, a_number, created_by, created_date, last_modified, last_modified_by) VALUES
+                  (1, '2021ABC123', 1, 'APPROVED', '198ab2cb-43a6-4010-ad05-a948c09bb68b', 'A123456789', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (3, '2021ABC456', 3, 'OPEN', NULL, 'A123456790', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 03:58:29.4282', '2021-03-27 03:58:29.4282', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46'),
+                  (2, '2021ABC456', 3, 'OPEN', NULL, 'A123456791', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 03:58:13.787757', '2021-03-27 04:03:50.633184', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46');
+          - sql:
+              sql: INSERT INTO public.correspondences (id, case_id, document_key, doc_type, created_by, created_date, last_modified, last_modified_by) VALUES 
+                  (3, 1, 'ABC_123_DEF', 'FEE_RECEIPT', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '2021-03-27 03:11:08.261323', '2021-03-27 03:11:08.261323', '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (4, 1, 'ABC_124_DEF', 'APPROVAL_RECEIPT', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '2021-03-27 03:17:06.883233', '2021-03-27 03:17:06.883233', '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (5, 3, 'FQQ_ZBH_9U6', 'FEE_RECEIPT', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 04:00:23.043121', '2021-03-27 04:03:50.633536', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46');
+          - sql:
+              sql: INSERT INTO public.security_checks (id, case_id, security_check_type, security_check_status, created_by, created_date, last_modified, last_modified_by) VALUES 
+                  (1, 1, 'BIOMETRIC_CHECK', 'DONE', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '2021-03-27 03:15:23.325652', '2021-03-27 03:16:08.428966', '198ab2cb-43a6-4010-ad05-a948c09bb68b');
+          - sql:
+              sql: INSERT INTO public.revinfo (rev, revtstmp, username) VALUES 
+                  (1, 1616813928014, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (2, 1616814668339, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (3, 1616814747806, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (4, 1616814923329, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (5, 1616814968431, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (6, 1616814993960, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (7, 1616815026897, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (8, 1616817493909, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46'),
+                  (9, 1616817509431, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46'),
+                  (10, 1616817623052, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46'),
+                  (11, 1616817704595, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46'),
+                  (12, 1616817830636, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46');
+          - sql:
+              sql: INSERT INTO public.cases_aud (id, rev, revtype, case_number, form_id, status, adjudicator_id, created_by, created_date, last_modified_by, last_modified) VALUES 
+                  (1, 1, 0, '2021ABC123', 1, 'OPEN', NULL, NULL, NULL, NULL, NULL),
+                  (1, 3, 1, '2021ABC123', 1, 'ASSIGNED', '198ab2cb-43a6-4010-ad05-a948c09bb68b', NULL, NULL, NULL, NULL),
+                  (1, 6, 1, '2021ABC123', 1, 'APPROVED', '198ab2cb-43a6-4010-ad05-a948c09bb68b', NULL, NULL, NULL, NULL),
+                  (2, 8, 0, '2021ABC234', 2, 'OPEN', NULL, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 03:58:13.787757', NULL, NULL),
+                  (3, 9, 0, '2021ABC456', 3, 'OPEN', NULL, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 03:58:29.4282', NULL, NULL),
+                  (2, 11, 1, '2021ABC234', 2, 'ASSIGNED', '198ab2cb-43a6-4010-ad05-a948c09bb68b', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 03:58:13.787757', NULL, NULL),
+                  (2, 12, 1, '2021ABC456', 3, 'OPEN', NULL, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 03:58:13.787757', NULL, NULL);
+          - sql:
+              sql: INSERT INTO public.correspondences_aud (id, rev, revtype, case_id, document_key, doc_type, created_by, created_date, last_modified_by, last_modified) VALUES 
+                  (3, 2, 0, NULL, 'ABC_123_DEF', 'FEE_RECEIPT', NULL, NULL, NULL, NULL),
+                  (4, 7, 0, NULL, 'ABC_124_DEF', 'APPROVAL_RECEIPT', NULL, NULL, NULL, NULL),
+                  (5, 10, 0, NULL, 'GH9_ABC_M5Z', 'FEE_RECEIPT', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 04:00:23.043121', NULL, NULL),
+                  (5, 12, 1, NULL, 'FQQ_ZBH_9U6', 'FEE_RECEIPT', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', '2021-03-27 04:00:23.043121', NULL, NULL);
+          - sql:
+              sql: INSERT INTO public.security_checks_aud (id, rev, revtype, case_id, security_check_type, security_check_status, created_by, created_date, last_modified_by, last_modified) VALUES 
+                  (1, 4, 0, NULL, 'BIOMETRIC_CHECK', 'PENDING', NULL, NULL, NULL, NULL),
+                  (1, 5, 1, NULL, 'BIOMETRIC_CHECK', 'DONE', NULL, NULL, NULL, NULL);
+  - changeSet:
+       id: baseline-4
+       author: rrussell
+       changes:
+          - addColumn:
+              tableName: cases_aud
+              columns:
+                 name: applicant_id
+                 type: varchar(255)
+          - addColumn:
+              tableName: cases
+              columns:
+                 name: applicant_id
+                 type: varchar(255)
+          - sql:
+              sql: UPDATE cases set applicant_id = 'ecc14638-bfb9-4791-bab1-4ea37b47ef46' where id = 1;
+  - changeSet:
+      id: baseline-5
+      author: cwildes
+      changes:
+        - sql:
+            sql: UPDATE cases set status = 'ACCEPTING' where status = 'OPEN';
+              UPDATE cases set status = 'SUBMITTED' where status = 'ASSIGNED';
+              UPDATE cases set status = 'VALIDATED' where status = 'APPROVED';
+              UPDATE cases set status = 'REJECTED' where status = 'DENIED';
+        - sql:
+            sql: UPDATE cases_aud set status = 'ACCEPTING' where status = 'OPEN';
+              UPDATE cases_aud set status = 'SUBMITTED' where status = 'ASSIGNED';
+              UPDATE cases_aud set status = 'VALIDATED' where status = 'APPROVED';
+              UPDATE cases_aud set status = 'REJECTED' where status = 'DENIED';
+  - changeSet:
+      id: baseline-6
+      author: rrussell
+      changes:
+          - addColumn:
+              tableName: cases_aud
+              columns:
+                 name: form_number
+                 type: varchar(255)
+          - addColumn:
+              tableName: cases
+              columns:
+                 name: form_number
+                 type: varchar(255)
+          - dropColumn:
+              tableName: cases
+              columnName: form_id
+          - dropColumn:
+              tableName: cases_aud
+              columnName: form_id
+          - sql:
+              sql: UPDATE cases set applicant_id = 'b565f716-bb40-462e-abf0-904f0009b4e0', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '1' where id = 1;
+              sql: UPDATE cases_aud set applicant_id = 'b565f716-bb40-462e-abf0-904f0009b4e0', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '1' where id = 1;
+              sql: UPDATE cases set applicant_id = '4ba3cf55-05f8-4220-b5f7-0740ba74fc16', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '2021_I131_X9' where id = 2;
+              sql: UPDATE cases_aud set applicant_id = '4ba3cf55-05f8-4220-b5f7-0740ba74fc16', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '2021_I131_X9' where id = 2;
+              sql: UPDATE cases set applicant_id = '517b079a-1027-4935-a3d2-72f6a065f727', form_number = '2021_I131_X5' where id = 3;
+              sql: UPDATE cases_aud set applicant_id = '517b079a-1027-4935-a3d2-72f6a065f727', form_number = '2021_I131_X5' where id = 3;
+  - changeSet:
+      id: baseline-7
+      author: rrussell
+      changes:
+          - sql:
+              sql: UPDATE cases set applicant_id = 'b565f716-bb40-462e-abf0-904f0009b4e0', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '1' where id = 1;
+          - sql:
+              sql: UPDATE cases_aud set applicant_id = 'b565f716-bb40-462e-abf0-904f0009b4e0', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '1' where id = 1;
+          - sql:
+              sql: UPDATE cases set applicant_id = '4ba3cf55-05f8-4220-b5f7-0740ba74fc16', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '2021_I131_X9' where id = 2;
+          - sql:
+              sql: UPDATE cases_aud set applicant_id = '4ba3cf55-05f8-4220-b5f7-0740ba74fc16', adjudicator_id = '6613d0b2-aa60-478b-8dd4-55966f07e085', form_number = '2021_I131_X9' where id = 2;
+          - sql:
+              sql: UPDATE cases set applicant_id = '517b079a-1027-4935-a3d2-72f6a065f727', form_number = '2021_I131_X5' where id = 3;
+          - sql:
+              sql: UPDATE cases_aud set applicant_id = '517b079a-1027-4935-a3d2-72f6a065f727', form_number = '2021_I131_X5' where id = 3;
+          - sql:
+              sql: UPDATE cases set a_number = 'A918073655' where id = 2;
+          - sql:
+              sql: UPDATE cases set a_number = 'A827972941' where id = 3;
+  - changeSet:
+      id: baseline-8
+      author: rrussell
+      changes:
+         - sql:
+              sql: update cases set applicant_id = 'b8ba171a-3094-4fee-99f1-1984c4d41ff8' where id = 1;
+         - sql:
+              sql: update cases_aud set applicant_id = 'b8ba171a-3094-4fee-99f1-1984c4d41ff8' where id = 1;
+         - sql:
+              sql: update cases set case_number = '2021ABC234', form_number = '2', adjudicator_id = null, a_number = 'A918073655'  where id = 2;
+         - sql:
+              sql: update cases_aud set case_number = '2021ABC234', form_number = '2', adjudicator_id = null, a_number = 'A918073655'  where id = 2;
+         - sql:
+              sql: update cases set a_number = 'A827972941' where id = 3;
+         - sql:
+              sql: update cases_aud set a_number = 'A827972941' where id = 3;
+         - sql:
+              sql: INSERT INTO cases (case_number, form_number, status, adjudicator_id, a_number, applicant_id, created_by, created_date, last_modified, last_modified_by) VALUES
+                  ('2021ABC567', '2021_I131_X1', 'SUBMITTED', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0', 'A000000001', '470b6681-2d1e-49c4-94b9-9c3647200c55', '470b6681-2d1e-49c4-94b9-9c3647200c55', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', '470b6681-2d1e-49c4-94b9-9c3647200c55'),
+                  ('2021ABC890', '2021_I131_X8', 'REJECTED', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0', 'A000000003', '44839225-53c1-4fb3-998d-189b48c64951', '44839225-53c1-4fb3-998d-189b48c64951', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', '44839225-53c1-4fb3-998d-189b48c64951');
+         - sql:
+              sql: INSERT INTO correspondences (case_id, document_key, doc_type, created_by, created_date, last_modified, last_modified_by) VALUES
+                  ((select id from cases where case_number = '2021ABC234'), 'ABC_125_DEF', 'FEE_RECEIPT', '4ba3cf55-05f8-4220-b5f7-0740ba74fc16', '2021-03-27 03:11:08.261323', '2021-03-27 03:11:08.261323', '4ba3cf55-05f8-4220-b5f7-0740ba74fc16'),
+                  ((select id from cases where case_number = '2021ABC567'), 'ABC_126_DEF', 'FEE_RECEIPT', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '2021-03-27 03:11:08.261323', '2021-03-27 03:11:08.261323', '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  ((select id from cases where case_number = '2021ABC890'), 'ABC_127_DEF', 'FEE_RECEIPT', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '2021-03-27 03:17:06.883233', '2021-03-27 03:17:06.883233', '198ab2cb-43a6-4010-ad05-a948c09bb68b');
+         - sql:
+              sql: INSERT INTO security_checks (case_id, security_check_type, security_check_status, created_by, created_date, last_modified, last_modified_by) VALUES
+                  ((select id from cases where case_number = '2021ABC890'), 'BIOMETRIC_CHECK', 'DONE', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0', '2021-03-27 03:15:23.325652', '2021-03-27 03:16:08.428966', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0');
+         - sql:
+              sql: INSERT INTO revinfo (rev, revtstmp, username) VALUES
+                  (43, 1614439361000, '470b6681-2d1e-49c4-94b9-9c3647200c55'),
+                  (44, 1614612161000, 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0'),
+                  (45, 1614439361000, '44839225-53c1-4fb3-998d-189b48c64951'),
+                  (46, 1614612161000, '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  (47, 1616813928014, 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0'),
+                  (48, 1614698561000, '4ba3cf55-05f8-4220-b5f7-0740ba74fc16'),
+                  (49, 1614698561000, '470b6681-2d1e-49c4-94b9-9c3647200c55'),
+                  (50, 1614698561000, 'ecc14638-bfb9-4791-bab1-4ea37b47ef46'),
+                  (51, 1616772161000, 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0');
+         - sql:
+              sql: INSERT INTO cases_aud (id, rev, revtype, case_number, form_number, status, adjudicator_id, a_number, applicant_id, created_by, created_date, last_modified, last_modified_by) VALUES
+                  ((select id from cases where case_number = '2021ABC567'), 43, 0, '2021ABC567', '2021_I131_X1', 'ACCEPTING', NULL, 'A000000001', '470b6681-2d1e-49c4-94b9-9c3647200c55', '470b6681-2d1e-49c4-94b9-9c3647200c55', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', '470b6681-2d1e-49c4-94b9-9c3647200c55'),
+                  ((select id from cases where case_number = '2021ABC567'), 44, 1, '2021ABC567', '2021_I131_X1', 'SUBMITTED', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0', 'A000000001', '470b6681-2d1e-49c4-94b9-9c3647200c55', '470b6681-2d1e-49c4-94b9-9c3647200c55', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0'),
+                  ((select id from cases where case_number = '2021ABC890'), 45, 0, '2021ABC890', '2021_I131_X8', 'ACCEPTING', NULL, 'A000000003', '44839225-53c1-4fb3-998d-189b48c64951', '44839225-53c1-4fb3-998d-189b48c64951', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', '44839225-53c1-4fb3-998d-189b48c64951'),
+                  ((select id from cases where case_number = '2021ABC890'), 46, 1, '2021ABC890', '2021_I131_X8', 'SUBMITTED', '198ab2cb-43a6-4010-ad05-a948c09bb68b', 'A000000003', '44839225-53c1-4fb3-998d-189b48c64951', '44839225-53c1-4fb3-998d-189b48c64951', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', '198ab2cb-43a6-4010-ad05-a948c09bb68b'),
+                  ((select id from cases where case_number = '2021ABC890'), 47, 1, '2021ABC890', '2021_I131_X8', 'REJECTED', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0', 'A000000003', '44839225-53c1-4fb3-998d-189b48c64951', '44839225-53c1-4fb3-998d-189b48c64951', '2021-03-27 02:58:47.900914', '2021-03-27 03:17:06.888343', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0');
+         - sql:
+              sql: INSERT INTO correspondences_aud (id, rev, revtype, case_id, document_key, doc_type, created_by, created_date, last_modified, last_modified_by) VALUES
+                  ((select id from correspondences where case_id = (select id from cases where case_number = '2021ABC234')), 48, 0, (select id from cases where case_number = '2021ABC234'), 'ABC_125_DEF', 'FEE_RECEIPT', '4ba3cf55-05f8-4220-b5f7-0740ba74fc16', '2021-03-27 03:11:08.261323', '2021-03-27 03:11:08.261323', '4ba3cf55-05f8-4220-b5f7-0740ba74fc16'),
+                  ((select id from correspondences where case_id = (select id from cases where case_number = '2021ABC567')), 49, 0, (select id from cases where case_number = '2021ABC567'), 'ABC_126_DEF', 'FEE_RECEIPT', '470b6681-2d1e-49c4-94b9-9c3647200c55', '2021-03-27 03:11:08.261323', '2021-03-27 03:11:08.261323', '470b6681-2d1e-49c4-94b9-9c3647200c55'),
+                  ((select id from correspondences where case_id = (select id from cases where case_number = '2021ABC890')), 50, 0, (select id from cases where case_number = '2021ABC890'), 'ABC_127_DEF', 'FEE_RECEIPT', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '2021-03-27 03:17:06.883233', '2021-03-27 03:17:06.883233', '198ab2cb-43a6-4010-ad05-a948c09bb68b');
+         - sql:
+              sql: INSERT INTO security_checks_aud (id, rev, revtype, case_id, security_check_type, security_check_status, created_by, created_date, last_modified, last_modified_by) VALUES  
+                  ((select id from security_checks where case_id = (select id from cases where case_number = '2021ABC890')), 51, 0, (select id from cases where case_number = '2021ABC890'), 'BIOMETRIC_CHECK', 'DONE', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0', '2021-03-27 03:15:23.325652', '2021-03-27 03:16:08.428966', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0'); 
+  - changeSet:
+      id: baseline-9
+      author: cwildes
+      changes:
+        - sql:
+            sql: UPDATE security_checks set security_check_status = 'FAVORABLE';
+              UPDATE security_checks set security_check_type = 'A_NUMBER';
+        - sql:
+            sql:
+              UPDATE security_checks_aud set security_check_status = 'FAVORABLE';
+              UPDATE security_checks_aud set security_check_type = 'A_NUMBER';
+        - addColumn:
+            tableName: cases_aud
+            columns:
+              name: security_check_validated
+              type: boolean
+        - addColumn:
+            tableName: cases
+            columns:
+              name: security_check_validated
+              type: boolean
+              defaultValue: false
+        - sql:
+            sql: UPDATE cases_aud set security_check_validated = false;
+  - changeSet:
+      id: baseline-10
+      author: cwildes
+      changes:
+        - sql:
+            sql: UPDATE security_checks set security_check_status = 'FAVORABLE';
+              UPDATE security_checks set security_check_type = 'A_NUMBER';
+        - sql:
+            sql:
+              UPDATE security_checks_aud set security_check_status = 'FAVORABLE';
+              UPDATE security_checks_aud set security_check_type = 'A_NUMBER';
+  - changeSet:
+      id: baseline-11
+      author: cwildes
+      changes:
+        - createSequence:
+            sequenceName: case_num_seq
+            incrementBy: 1
+            startValue: 1
+  - changeSet:
+      id: baseline-12
+      author: cwildes
+      changes:
+        - sql:
+            sql: UPDATE cases set form_number = '2021_I131_X9' where id = 2;
+        - sql:
+            sql: UPDATE cases_aud set form_number = '2021_I131_X9' where id = 2;

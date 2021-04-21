@@ -1,0 +1,36 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: speed-forms-svc-route
+  annotations:
+    description:
+    tags: speed
+    template.openshift.io/bindable: 'false'
+labels:
+  template: speed-forms-svc-route
+objects:
+
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${SVC_NAME}"
+  spec:
+    host: "${APPLICATION_DOMAIN}"
+    to:
+      kind: Service
+      name: "${SVC_NAME}"
+    tls:
+      termination: edge
+
+parameters:
+- name: SVC_NAME
+  displayName: Microservice name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: ''
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the Node.js service, if left
+    blank a value will be defaulted.
+  value: ''

@@ -1,0 +1,80 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: speed-reports-web-pipeline
+  annotations:
+    description:
+    tags: speed
+    iconClass: icon-nodejs
+    template.openshift.io/bindable: 'false'
+labels:
+  template: speed-reports-web-pipeline
+objects:
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Keeps track of changes in the application image
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: ${NAME}
+    name: ${NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${NAME}:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      type: Binary
+      binary: {}
+    strategy:
+      dockerStrategy:
+        noCache: true
+        from:
+          kind: ImageStreamTag
+          name: nginx:1.13
+      type: Docker
+    triggers: []
+
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: speed-reports-web-svc
+- name: CI_NAME
+  displayName: CI name
+  required: true
+  value: speed-reports-web-svc-ci
+- name: NAMESPACE
+  displayName: Namespace
+  description: The OpenShift Namespace where the ImageStream resides.
+  required: true
+  value: ci
+- name: SSH_KEY_NAME
+  displayName: SSH key for git checkout
+  required: true
+  value: ci-openshiftkey
+- name: SOURCE_REPOSITORY_URL
+  displayName: Git Repository URL
+  description: The URL of the repository with your application source code.
+  required: true
+  value: git@github.com:Steampunk-SPEED/speed-reports-web.git
+- name: SOURCE_REPOSITORY_REF
+  displayName: Git Reference
+  description: Set this to a branch name, tag or other ref of your repository if you
+    are not using the default branch.
+  value: "develop"
+- name: CONTEXT_DIR
+  displayName: Context Directory
+  description: Set this to the relative path to your project if it is not in the root
+    of your repository.

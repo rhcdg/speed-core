@@ -1,0 +1,15 @@
+@Library('td-shared-lib') _
+
+if (env.CHANGE_ID) {
+    //if it's a PR run the pr pipeline
+    pr([svc: 'forms', project: 'speed'])
+} else if ('develop'.equals(env.BRANCH_NAME)) {
+    //if develop branch, run the develop pipeline
+    develop([svc: 'forms', project: 'speed'])
+} else if ('hotfix'.equals(env.BRANCH_NAME)) {
+    //if hotfix branch, run the develop pipeline
+    hotfix([svc: 'forms', project: 'speed'])
+} else if (!'release'.equals(env.BRANCH_NAME)) {
+    //any branch other than release, just run basic developer tests
+    branch()
+}

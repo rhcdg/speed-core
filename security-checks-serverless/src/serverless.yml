@@ -1,0 +1,17 @@
+service: security-checks-serverless
+
+frameworkVersion: ">=2.1.0 <3.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+functions:
+  processSecurityChecks:
+    handler: main.handler
+    events:
+      - http:
+          path: /security_checks?{a_number}&{first_name}&{last_name}
+          method: get
+    environment:
+      CIS_DATA_API_HOST: speed-api-gateway-stage.speedc2c24.steampunkfoundry.net

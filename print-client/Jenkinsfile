@@ -1,0 +1,31 @@
+@Library('td-shared-lib') _
+
+if (env.CHANGE_ID) {
+    //if it's a PR run the pr pipeline
+    pr([
+            svc                   : 'print-client',
+            project               : 'speed',
+            setup                 : { echo 'TBD' },
+            unitTestCommand       : { echo 'TBD' },
+            integrationTestCommand: { echo 'TBD' },
+            disableSonar          : true,
+            executable            : true
+    ])
+} else if ('develop'.equals(env.BRANCH_NAME)) {
+    //if develop branch, run custom pipeline
+    executable([
+            groupId   : 'net.steampunkfoundry.techdemo.client',
+            artifactId: 'print-client',
+            version   : '0.0.1-SNAPSHOT'
+    ])
+} else if ('hotfix'.equals(env.BRANCH_NAME)) {
+    //if hotfix branch, run the hotfix pipeline
+    hotfix([svc: 'print-client', project: 'speed', setup: { echo 'TBD' }])
+} else if (!'release'.equals(env.BRANCH_NAME)) {
+    //any branch other than release, just run basic developer tests
+    branch([
+            setup          : { echo 'TBD' },
+            unitTestCommand: { echo 'TBD' },
+            disableSonar   : true,
+    ])
+}

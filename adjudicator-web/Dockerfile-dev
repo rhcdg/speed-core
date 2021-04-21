@@ -1,0 +1,27 @@
+FROM node:14-alpine AS build
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY package.json package-lock.json /app/
+
+RUN npm install
+
+COPY public /app/public
+COPY src /app/src
+
+COPY entrypoint.sh  /app/
+RUN chmod 744 /app/entrypoint.sh
+
+# Entrypoint for rewriting.
+COPY ./entrypoint.sh /entrypoint.sh
+
+RUN sed -i 's/bash/sh/g' /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+### Containers should NOT run as root as a good practice
+USER 0
+
+ENTRYPOINT [ "/entrypoint.sh"]
+CMD ["start"]

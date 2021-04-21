@@ -1,0 +1,188 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('org.owasp:dependency-check-gradle:6.1.1')
+    }
+}
+
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'org.springframework.boot' version '2.3.9.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'jacoco'
+    id 'org.sonarqube' version '3.1.1'
+    id 'checkstyle'
+    id 'io.freefair.lombok' version '5.3.0'
+}
+
+if(JavaVersion.current() != JavaVersion.VERSION_11){
+    throw new GradleException("This build must be run with Java 11. Currently running Java ${JavaVersion.current()}")
+}
+
+apply plugin: 'org.owasp.dependencycheck'
+
+dependencyCheck {
+    suppressionFile = "owasp.suppression.xml"
+    failBuildOnCVSS = 4
+}
+
+group = 'net.steampunkfoundry.techdemo'
+version = '0.0.1-SNAPSHOT'
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+    maven {
+        url = System.env.SPEED_REPO_URL
+        
+        credentials {
+            username System.env.SPEED_REPO_USER 
+            password System.env.SPEED_REPO_PASSWORD
+        }
+    }
+}
+
+sourceSets {
+    itest {
+        java.srcDir file('src/itest/java')
+        resources.srcDir file('src/itest/resources')
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+sonarqube {
+    properties {
+        property 'sonar.coverage.exclusions', '**/*Application.java,**/*Config.java,**/repository/*'
+        property 'sonar.zaproxy.reportPath', 'reports/zap.xml'
+        property 'sonar.zaproxy.htmlReportPath', 'reports/zap.html'
+    }
+}
+
+
+task itest(type: Test) {
+    testClassesDirs = sourceSets.itest.output.classesDirs
+    classpath = sourceSets.itest.runtimeClasspath
+    
+    /*
+        Changing destination to 'test.exec' instead of default itest.exec because jacocoTestReport
+        fails if there is not a 'test.exec' present. (Currently there are no unit tests, so no 
+        auto-generated test.exec)
+        
+        Later, if unit tests are added later (i.e., test.exec is generated, possibly conflicting 
+        with this one), then this should be removed.
+    */
+    jacoco.destinationFile = file("$buildDir/jacoco/test.exec")
+}
+
+jacocoTestReport.dependsOn jacocoTestCoverageVerification
+test.finalizedBy jacocoTestReport
+itest.finalizedBy jacocoTestReport
+
+check.dependsOn itest
+itest.mustRunAfter test
+
+jacoco {
+    toolVersion = '0.8.5'
+    reportsDir = file("${buildDir}/reports/jacoco")
+}
+
+jacocoTestReport {
+    //For dependsOn & executionData, add 'test' if unit tests are added later. Currently there are only integration tests...
+    dependsOn test
+    executionData(test)
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    //For dependsOn & executionData, add 'test' if unit tests are added later. Currently there are only integration tests...
+    dependsOn test
+    executionData(test)
+    violationRules {
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.90
+            }
+            // Exclude main app file from coverage verification
+            excludes = [
+                'net.steampunkfoundry.techdemo.docs.Application',
+                'net.steampunkfoundry.techdemo.docs.config.security.SecurityConfig',
+                'net.steampunkfoundry.techdemo.docs.config.AuditorAwareImpl',
+                'net.steampunkfoundry.techdemo.docs.config.ValidationConfig'
+                ]
+        }
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 1.0
+            }
+        }
+    }
+}
+
+configurations {
+    itestCompile.extendsFrom testCompile
+    itestRuntime.extendsFrom testRuntime
+}
+
+checkstyle {
+    toolVersion '8.34'
+    configFile file('config/checkstyle/google_checks.xml')
+    maxWarnings = 0
+}
+
+bootRun {
+    systemProperties System.properties
+}
+
+dependencies {
+    implementation enforcedPlatform('net.steampunkfoundry.techdemo:td-bom:1.0.6')
+
+    implementation 'io.springfox:springfox-data-rest'
+    implementation 'io.springfox:springfox-swagger-ui'
+    implementation 'io.springfox:springfox-swagger2'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api'
+    implementation 'javax.validation:validation-api'
+    implementation 'org.glassfish.jaxb:jaxb-runtime'
+    implementation 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'    
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    implementation('org.mongodb:mongodb-driver-sync') {
+        version {
+            strictly '4.1.2'
+        }
+    }
+    implementation('org.mongodb:mongodb-driver-core') {
+        version {
+            strictly '4.1.2'
+        }
+    }
+    implementation('org.mongodb:bson') {
+        version {
+            strictly '4.1.2'
+        }
+    }
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation'
+}

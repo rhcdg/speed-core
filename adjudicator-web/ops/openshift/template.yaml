@@ -1,0 +1,213 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: speed-demo-app
+  annotations:
+    description:
+    tags: speed
+    iconClass: icon-nodejs
+    template.openshift.io/bindable: 'false'
+labels:
+  template: speed-demo-app
+objects:
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Exposes and load balances the application pods
+  spec:
+    ports:
+    - name: web
+      port: 80
+      targetPort: 80
+    selector:
+      name: "${NAME}"
+
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  spec:
+    host: "${APPLICATION_DOMAIN}"
+    to:
+      kind: Service
+      name: "${NAME}"
+
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Keeps track of changes in the application image
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      pipeline.alpha.openshift.io/uses: '[{"name": "${NAME}", "namespace": "", "kind": "DeploymentConfig"}]'
+    labels:
+      app: speed-adjudicator-web-pipeline
+    name: speed-adjudicator-web-pipeline
+  spec:
+    strategy:
+      jenkinsPipelineStrategy:
+        jenkinsfile: |
+          node('nodejs8') {
+              stage("build") {
+                  git credentialsId: 'ci-openshiftkey', url: '${SOURCE_REPOSITORY_URL}'
+                  sh "ls -l"
+                  sh "npm install"
+                  sh "npm run build -- --prod --environment prod"
+              }
+              stage("Build Image") {
+                  sh "ls -l"
+                  sh "oc start-build ${NAME} --from-dir='.' -n ${NAMESPACE}"
+                  openshiftVerifyBuild bldCfg: "${NAME}", namespace: "${NAMESPACE}", waitTime: '20', waitUnit: 'min'
+              }
+              stage("Deploy") {
+                  openshiftDeploy deploymentConfig: "${NAME}", namespace: "${NAMESPACE}"
+              }
+          }
+    type: JenkinsPipeline
+#      jenkinsfilePath:
+    triggers:
+    - github:
+        secret: secret101
+      type: GitHub
+    - generic:
+        secret: secret101
+      type: Generic
+
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: ${NAME}
+  name: ${NAME}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: ${NAME}:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    dockerfile: |-
+      FROM nginx
+      COPY  ./dist/ /usr/share/nginx/html
+    binary:
+      asDir: dist/
+    type: Docker
+  strategy:
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: nginx:1.13
+    type: Docker
+  triggers: []
+
+
+
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Defines how to deploy the application server
+      template.alpha.openshift.io/wait-for-ready: 'true'
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - web
+        from:
+          kind: ImageStreamTag
+          name: "${NAME}:latest"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "${NAME}"
+    template:
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        containers:
+        - name: web
+          image: " "
+          ports:
+          - containerPort: 80
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 3
+            httpGet:
+              path: "/"
+              port: 80
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            httpGet:
+              path: "/"
+              port: 80
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT}"
+
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: speed-adjudicator-web
+- name: NAMESPACE
+  displayName: Namespace
+  description: The OpenShift Namespace where the ImageStream resides.
+  required: true
+  value: ci
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  description: Maximum amount of memory the Node.js container can use.
+  required: true
+  value: 1Gi
+- name: SOURCE_REPOSITORY_URL
+  displayName: Git Repository URL
+  description: The URL of the repository with your application source code.
+  required: true
+  value: git@github.com:Steampunk-SPEED/speed-adjudicator-web.git
+- name: SOURCE_REPOSITORY_REF
+  displayName: Git Reference
+  description: Set this to a branch name, tag or other ref of your repository if you
+    are not using the default branch.
+- name: CONTEXT_DIR
+  displayName: Context Directory
+  description: Set this to the relative path to your project if it is not in the root
+    of your repository.
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the Node.js service, if left
+    blank a value will be defaulted.
+  value: 'web.speedc2c24.steampunkfoundry.net'
+- name: GITHUB_WEBHOOK_SECRET
+  displayName: GitHub Webhook Secret
+  description: Github trigger secret.  A difficult to guess string encoded as part
+    of the webhook URL.  Not encrypted.
+  generate: expression
+  from: "[a-zA-Z0-9]{40}"
+- name: GENERIC_WEBHOOK_SECRET
+  displayName: Generic Webhook Secret
+  description: A secret string used to configure the Generic webhook.
+  generate: expression
+  from: "[a-zA-Z0-9]{40}"
+- name: NPM_MIRROR
+  displayName: Custom NPM Mirror URL
+  description: The custom NPM mirror URL
+  value: ''

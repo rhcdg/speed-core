@@ -1,0 +1,53 @@
+{
+  "name": "security-checks",
+  "version": "1.0.0",
+  "description": "executes business rules and security checks",
+  "main": "main.js",
+  "scripts": {
+    "test": "test",
+    "lint": "eslint .",
+    "lint:updated": "pipe-git-updated --ext=js -- eslint --ignore-path .gitignore",
+    "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
+    "prettier-check:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=json --ext=md --ext=yaml --ext=yml -- prettier -c",
+    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml}\"",
+    "prettify:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=json --ext=md --ext=yaml --ext=yml -- prettier --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Steampunk-SPEED/speed-security-checks.git"
+  },
+  "author": "jared.ladner@geocent.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Steampunk-SPEED/speed-security-checks/issues"
+  },
+  "homepage": "https://github.com/Steampunk-SPEED/speed-security-checks#readme",
+  "devDependencies": {
+    "@serverless/eslint-config": "^3.0.0",
+    "eslint": "^7.23.0",
+    "eslint-plugin-import": "^2.22.1",
+    "git-list-updated": "^1.2.1",
+    "jest": "^26.6.3",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1",
+    "simple-git-hooks": "^2.2.0"
+  },
+  "eslintConfig": {
+    "extends": "@serverless/eslint-config/node",
+    "root": true,
+    "rules": {
+      "no-console": "off",
+      "prefer-arrow-callback":  "off"
+    }
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "npm run lint && prettier --write"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
+}

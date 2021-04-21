@@ -1,0 +1,37 @@
+@Library('td-shared-lib') _
+
+PROJECT = 'speed'
+SERVICE = 'analytics'
+
+if (env.CHANGE_ID) {
+    //if it's a PR run the pr pipeline
+    pr([
+            agentLabel: 'terraform',
+            setup: {},
+            lambdaService: true,
+            disableSonar: true,
+            sonarScanCommand: 'export JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions"; npm install -g sonarqube-scanner; npm install; sonar-scanner -Dsonar.junit.reportPaths=junit.xml -Dsonar.zaproxy.reportPath=reports/zap.xml -Dsonar.zaproxy.htmlReportPath=reports/zap.html',
+            svc: SERVICE,
+            project: PROJECT,
+    ])
+} else if ('develop'.equals(env.BRANCH_NAME)) {
+    //if develop branch, run the develop pipeline
+    develop([svc: SERVICE, project: PROJECT, lambdaService: true])
+} else if ('hotfix'.equals(env.BRANCH_NAME)) {
+    //if hotfix branch, run the hotfix pipeline
+    hotfix([svc: SERVICE, project: PROJECT, lambdaService: true])
+} else if (!'release'.equals(env.BRANCH_NAME)) {
+    //any branch other than release, just run basic developer tests
+    branch([
+            agentLabel: 'terraform',
+            setup: {
+                withCredentials([usernamePassword(credentialsId: 'jenkins-aws-access', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh 'ops/terraform_deploy.sh'
+                }
+            },
+            lambdaService: true,
+            destroyTimeout: 1,
+            disableSonar: true,
+            sonarScanCommand: 'export JAVA_TOOL_OPTIONS="-XX:+UnlockExperimentalVMOptions"; npm install -g sonarqube-scanner; npm install; sonar-scanner -Dsonar.junit.reportPaths=junit.xml -Dsonar.zaproxy.reportPath=reports/zap.xml -Dsonar.zaproxy.htmlReportPath=reports/zap.html'
+    ])
+}

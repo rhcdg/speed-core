@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: forms
+  devtools:
+    remote:
+      secret: fakesecret
+  data:
+    mongodb:
+      uri: mongodb://test-user:fakepass@localhost:12345/form?authSource=admin
+    rest:
+      base-path: /api/data
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.us-east-2.amazonaws.com/us-east-2_CDRh3fkc0
+logging.level:
+  root: INFO
+
+cases.endpoint: http://localhost/api/data/forms
+
+usps.api: http://localhost/usps
+usps.client.key: 1234

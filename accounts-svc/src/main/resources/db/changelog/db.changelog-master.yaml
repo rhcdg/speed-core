@@ -1,0 +1,136 @@
+databaseChangeLog:
+  - changeSet: 
+      id: baseline-0
+      author: rrussell
+      changes:
+        - createTable:
+            tableName: revinfo
+            columns:
+              - column: 
+                  name: rev
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                      - nullable: false
+                      - primaryKey: true
+              - column: 
+                  name: revtstmp 
+                  type: BIGINT       
+        - createTable:
+            tableName: account_audit_log
+            columns:
+                - column: 
+                    name: id
+                    type: BIGINT
+                - column: 
+                    name: rev
+                    type: INT
+                    constraints: 
+                        - referencedTableName: revinfo
+                        - foreignKeyName: fk_account_audit_log_revinfo
+                        - referencedColumnNames: rev
+                        - nullable: false                       
+                - column:
+                    name: revtype
+                    type: SMALLINT
+                    constraints:
+                        - nullable: false
+                - column: 
+                    name: first_name
+                    type: VARCHAR(255)
+                - column: 
+                    name: last_name
+                    type: VARCHAR(255)
+                - column: 
+                    name: email
+                    type: VARCHAR(255)
+                - column:
+                    name: email_verified
+                    type: boolean
+                - column: 
+                    name: username
+                    type: VARCHAR(255)   
+                - column: 
+                    name: username_uuid
+                    type: VARCHAR(255)   
+                - column:
+                    name: this_login_date
+                    type: BIGINT
+                - column:
+                    name: previous_login_date
+                    type: BIGINT
+        - createSequence:
+            sequenceName: hibernate_sequence
+            incrementBy: 1
+            startValue: 1            
+        - createTable:
+            tableName: account
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    - primaryKey: true
+              - column:
+                  name: first_name
+                  type: varchar(255)
+              - column:
+                  name: last_name
+                  type: varchar(255)
+              - column:
+                  name: email
+                  type: varchar(255)
+              - column:
+                  name: email_verified
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: username
+                  type: varchar(255)
+              - column:
+                  name: username_uuid
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: this_login_date
+                  type: BIGINT
+              - column:
+                  name: previous_login_date
+                  type: BIGINT
+        - addUniqueConstraint:
+            columnNames: username_uuid
+            tableName: account
+            constraintName: username_uuid_constraint
+        - sql:
+            sql: insert into account (first_name, last_name, username, email, username_uuid, this_login_date, previous_login_date, email_verified) values 
+                ('Admin I.', 'Strator', 'admin@test.com', 'admin@test.com', '198ab2cb-43a6-4010-ad05-a948c09bb68b', '1615907358487', '1615229155000', true),
+                ('Alan', 'Crouch', 'alan.crouch@steampunk.com', 'alan.crouch@steampunk.com', 'b565f716-bb40-462e-abf0-904f0009b4e0', NULL, NULL, true),
+                ('Bronson', 'Oeser', 'bronson.oeser@geocent.com', 'bronson.oeser@geocent.com', '3be5943d-a147-44bd-adec-1eb81f5da4e2', NULL, NULL, true),
+                ('D.', 'Boeser', 'dboeser@gmail.com', 'dboeser@gmail.com', '120f858a-bd93-440b-a031-155070a7fbd1', NULL, NULL, false),
+                ('D.M.', 'Brooking', 'dmbrooking@gmail.com', 'dmbrooking@gmail.com', 'f4a6d73b-e308-4483-b1c8-5b744a5620c2', NULL, NULL, false),
+                ('Data', 'Entry', 'dataentry@test.com', 'dataentry@test.com', '44839225-53c1-4fb3-998d-189b48c64951', NULL, NULL, true),
+                ('Joshua', 'Penton', 'joshua.penton@geocent.com', 'joshua.penton@geocent.com', '10954406-7fc8-4387-8108-d70014dc994e', NULL, NULL, true),
+                ('K.', 'Parsee', 'kparsee@yahoo.com', 'kparsee@yahoo.com', 'f87a3b0e-b8cb-4f77-a128-b23c365e4339', NULL, NULL, false),
+                ('New', 'User', 'newUser@test.com', 'newUser@test.com', '9e6734b3-6c9d-4307-a5f9-e69aac5a1d55', NULL, NULL, false),
+                ('Read', 'Only', 'readonly@test.com', 'readonly@test.com', '8f8ceb3a-bcfe-4dab-9e6e-0a9d6e17497a', NULL, NULL, true),
+                ('Richard', 'Russell', 'richard.russell@geocent.com', 'richard.russell@geocent.com', '986f9e5b-1f21-4ba3-8c42-6399e20469be', '1615907358487', '1615229155000', true),
+                ('Super', 'Visor', 'supervisor@test.com', 'supervisor@test.com', 'ecc14638-bfb9-4791-bab1-4ea37b47ef46', NULL, NULL, true),
+                ('Ritu', 'Rajma', 'Ritu.Rajma@test.com', 'Ritu.Rajma@test.com', '4ba3cf55-05f8-4220-b5f7-0740ba74fc16', '1617055407000', '1617055407000', true),
+                ('Seamus', 'Sheehan', 'Seamus.Sheehan@test.com', 'Seamus.Sheehan@test.com', '517b079a-1027-4935-a3d2-72f6a065f727', '1617055407000', '1617055407000', true),
+                ('Tomas', 'Traveler', 'Tomas.Traveler@test.com', 'Tomas.Traveler@test.com', '470b6681-2d1e-49c4-94b9-9c3647200c55', '1617055407000', '1617055407000', true),
+                ('Donna', 'Decision', 'Donna.Decision@test.com', 'Donna.Decision@test.com', 'efb0769c-aeb1-4403-ae0d-6e85ddfd33a0', '1617055407000', '1617055407000', true),
+                ('Mary', 'Metrics', 'Mary.Metrics@test.com', 'Mary.Metrics@test.com', '21ee138b-56c5-4f9c-8652-9afabb19383b', '1578002961000', '1617055407000', true),
+                ('Clayton', 'Lesch', 'Clayton.Lesch@test.com', 'Clayton.Lesch@test.com', '6cef8979-e823-4eae-b85e-7ff9cdd94139', '1617055407000', '1617055407000', true),
+                ('Rudolph', 'Legros', 'Rudolph.Legros@test.com', 'Rudolph.Legros@test.com', '0f5158db-6632-41ba-a4ce-c93c88b0ba9b', '1617055407000', '1617055407000', true);
+  - changeSet: 
+      id: baseline-1
+      author: rrussell
+      changes:
+        - sql:
+            sql: insert into account (first_name, last_name, username, email, username_uuid, this_login_date, previous_login_date, email_verified) values 
+                ('A. Judy', 'Cator', 'adjudicator@test.com', 'adjudicator@test.com', '6613d0b2-aa60-478b-8dd4-55966f07e085', '1615907358487', '1615229155000', true),
+                ('Test', 'Applicant', 'applicant@test.com', 'applicant@test.com', 'b8ba171a-3094-4fee-99f1-1984c4d41ff8', '1615907358487', '1615229155000', true);
+
+

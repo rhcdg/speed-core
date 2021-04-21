@@ -1,0 +1,41 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AWS_COGNITO_URL}
+
+zuul:
+  #Service will be mapped under the /api URI
+  #prefix: /api/data
+  sensitive-headers: Cookie,Set-Cookie
+
+  routes:
+    service1:
+      path: /service1/**
+      url: http://cases-svc:8080/
+    users:
+      path: /users/**
+      url: http://accounts-svc:8080/
+    documents:
+      path: /documents/**
+      url: http://forms-svc:8080/
+    cis-data:
+      path: /cis-data/**
+      url: http://cis-data-api-svc:3000/
+    analytics:
+      path: /analytics/**
+      url: https://8demkt6183.execute-api.us-east-2.amazonaws.com/analytics
+
+
+logging.level:
+  org.springframework: INFO
+  org.springframework.security: DEBUG
+  net.steampunkfoundry: INFO
+                   
+cors:
+  allowed:
+    origin: ${ALLOWED_CORS_HOST}
+  
+users-service:
+  endpoint: ${USERS_SERVICE_ENDPOINT}

@@ -1,0 +1,18 @@
+zuul:
+  sensitive-headers: Cookie,Set-Cookie
+  routes:
+    service1:
+      path: /service1/**
+      url: http://speed-cases-svc/
+    users:
+      path: /users/**
+      url: http://speed-accounts-svc/
+    documents:
+      path: /documents/**
+      url: http://speed-forms-svc/
+    cis-data:
+      path: /cis-data/**
+      url: http://speed-cis-data-api-svc/
+    analytics:
+      path: /analytics/**
+      url: https://8demkt6183.execute-api.us-east-2.amazonaws.com/analytics

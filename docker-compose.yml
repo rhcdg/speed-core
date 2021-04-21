@@ -1,0 +1,215 @@
+version: '3.8'
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: ./Dockerfile
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+  accounts-svc:
+    build:
+      context: ./accounts-svc
+      dockerfile: ./Dockerfile
+      args:
+        SPEED_REPO_URL: $SPEED_REPO_URL
+        SPEED_REPO_USER: $SPEED_REPO_USER
+        SPEED_REPO_PASSWORD: $SPEED_REPO_PASSWORD
+    ports:
+      - "9011:8080"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+  cases-svc:
+    build:
+      context: ./cases-svc
+      dockerfile: ./Dockerfile
+      args:
+        SPEED_REPO_URL: $SPEED_REPO_URL
+        SPEED_REPO_USER: $SPEED_REPO_USER
+        SPEED_REPO_PASSWORD: $SPEED_REPO_PASSWORD
+    ports:
+      - "9016:8080"
+    env_file:
+      - .env
+  cis-data-api-svc:
+    build:
+      context: ./cis-data-api
+      dockerfile: ./Dockerfile
+    ports:
+      - "9012:3000"
+    env_file:
+      - .env
+  adjudicator-web:
+    build:
+      context: ./adjudicator-web
+      dockerfile: ./Dockerfile
+      args:
+        webenv: ci
+        cognito_client_id: $REACT_APP_COGNITO_CLIENT_ID
+        cognito_signing_key_kid_1: $REACT_APP_COGNITO_SIGNING_KEY_KID_1
+        cognito_signing_key_n_1: $REACT_APP_COGNITO_SIGNING_KEY_N_1
+        cognito_signing_key_kid_2: $REACT_APP_COGNITO_SIGNING_KEY_KID_2
+        cognito_signing_key_n_2: $REACT_APP_COGNITO_SIGNING_KEY_N_2
+        analytics_measurement_id: $REACT_APP_ANALYTICS_MEASUREMENT_ID
+        splunk_forwarder_password: $SPLUNK_FORWARDER_PASSWORD
+        splunk_hostname: $SPLUNK_HOSTNAME
+    ports:
+      - "8000:80"
+    env_file:
+      - .env
+    depends_on:
+      - api-gateway
+  applicant-web:
+    build:
+      context: ./applicant-web
+      dockerfile: ./Dockerfile
+      args:
+        webenv: ci
+        cognito_client_id: $REACT_APP_COGNITO_CLIENT_ID
+        cognito_signing_key_kid_1: $REACT_APP_COGNITO_SIGNING_KEY_KID_1
+        cognito_signing_key_n_1: $REACT_APP_COGNITO_SIGNING_KEY_N_1
+        cognito_signing_key_kid_2: $REACT_APP_COGNITO_SIGNING_KEY_KID_2
+        cognito_signing_key_n_2: $REACT_APP_COGNITO_SIGNING_KEY_N_2
+        analytics_measurement_id: $REACT_APP_ANALYTICS_MEASUREMENT_ID
+        splunk_forwarder_password: $SPLUNK_FORWARDER_PASSWORD
+        splunk_hostname: $SPLUNK_HOSTNAME
+    ports:
+      - "8001:80"
+    env_file:
+      - .env
+    depends_on:
+      - api-gateway
+  reports-web:
+    build:
+      context: ./reports-web
+      dockerfile: ./Dockerfile
+      args:
+        webenv: ci
+        cognito_client_id: $REACT_APP_COGNITO_CLIENT_ID
+        cognito_signing_key_kid_1: $REACT_APP_COGNITO_SIGNING_KEY_KID_1
+        cognito_signing_key_n_1: $REACT_APP_COGNITO_SIGNING_KEY_N_1
+        cognito_signing_key_kid_2: $REACT_APP_COGNITO_SIGNING_KEY_KID_2
+        cognito_signing_key_n_2: $REACT_APP_COGNITO_SIGNING_KEY_N_2
+        analytics_measurement_id: $REACT_APP_ANALYTICS_MEASUREMENT_ID
+        splunk_forwarder_password: $SPLUNK_FORWARDER_PASSWORD
+        splunk_hostname: $SPLUNK_HOSTNAME
+    ports:
+      - "8002:80"
+      - "8090:8090"
+    env_file:
+      - .env
+    depends_on:
+      - api-gateway
+  hub:
+    image: selenium/hub:3.11.0-californium
+    ports:
+      - "4444:4444"
+  firefox:
+    image: selenium/node-firefox:3.11.0-californium
+    shm_size: 2GB
+    depends_on:
+      - hub
+    environment:
+      HUB_HOST: hub
+  chrome:
+    image: selenium/node-chrome:3.11.0-californium
+    shm_size: 2GB
+    depends_on:
+      - hub
+    environment:
+      HUB_HOST: hub
+  tests:
+    image: gradle:6.5-jdk11
+    working_dir: /home/gradle/tests
+    depends_on:
+      - firefox
+      - chrome
+      - zap
+      - adjudicator-web
+    volumes:
+      - ./test-automation:/home/gradle/tests
+      - ./test-automation/cache:/home/gradle/.gradle
+    command: gradle clean test aggregate --no-daemon -Dproperties=serenity.ci.properties
+  zap:
+    image: owasp/zap2docker-bare
+    command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.disablekey=true -config database.recoverylog=false -config connection.timeoutInSecs=120 -addoninstall pscanrulesAlpha -addoninstall pscanrulesBeta -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
+    ports:
+      - "8090:8090"
+  performance:
+    image: gradle:6.5-jdk11
+    working_dir: /home/gradle/tests
+    volumes:
+      - ./performance-test:/home/gradle/tests
+      - ./performance-test/cache:/home/gradle/.gradle
+    # depends_on:
+    #   - web
+    command: gradle clean gatlingRun -DwebUrl=http://web:80 -DgatewayUrl=http://api-gateway:8080
+  sonarqube:
+    image: sonarqube:lts-alpine
+    ports:
+    - "9000:9000"
+    - "9092:9092"
+    env_file:
+    - .env
+    depends_on:
+    - postgres
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: ./Dockerfile
+      args:
+        SPEED_REPO_URL: $SPEED_REPO_URL
+        SPEED_REPO_USER: $SPEED_REPO_USER
+        SPEED_REPO_PASSWORD: $SPEED_REPO_PASSWORD
+    ports:
+      - "9080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - accounts-svc
+      - cases-svc
+      - forms-svc
+  mongo:
+    build:
+      context: ./mongo
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./mongo/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MOVIES_MONGO_DB}
+      - MONGO_PORT=${MONGO_PORT}
+    env_file:
+      - .env
+  forms-svc:
+    build:
+      context: ./forms-svc
+      dockerfile: ./Dockerfile
+      args:
+        SPEED_REPO_URL: $SPEED_REPO_URL
+        SPEED_REPO_USER: $SPEED_REPO_USER
+        SPEED_REPO_PASSWORD: $SPEED_REPO_PASSWORD
+    ports:
+      - "9019:8080"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+  splunk:
+    image: splunk/splunk:latest
+    environment:
+      - SPLUNK_LICENSE_URI=Free
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=${SPLUNK_SERVER_PASSWORD}
+    ports:
+      - 8100:8000
+    volumes:
+      - ./so1-var:/opt/splunk/var
+      - ./so1-etc:/opt/splunk/etc
